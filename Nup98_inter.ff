@@ -1,0 +1,4 @@
+pair_coeff   2867*2898 2867*2898    lj/cut/soft    0.3   12.5    0.6
+pair_coeff   2867*2898 2911*2990    lj/cut/soft    0.3   12.5    0.6
+pair_coeff   2911*2990 2911*2990    lj/cut/soft    0.3   12.5    0.6
+

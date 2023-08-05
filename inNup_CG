@@ -1,0 +1,152 @@
+
+variable TEMP		equal   300.0
+variable PRESS 		equal   0.0
+variable RUNTIME	equal   35000000         # (35x1e6 timesteps)
+variable RESTART        equal   ${RUNTIME}/7  	 # frequency of writing restart file
+variable dumptrj	equal	500000
+
+variable SEED  		equal  	12392
+variable SEED2   	equal   $( v_SEED + 1099 )
+variable SEED3  	equal   $( v_SEED + 80192 ) 
+variable SEED4  	equal   $( v_SEED + 7102 )
+variable SEED5 		equal   $( v_SEED + 30192 )
+
+variable		vstep equal step
+
+include 		"system.init"
+	
+#########		READ DATA FILE ######################
+read_data		"NPC-NUP98_Capsid.data"
+
+include			"soft.ff"
+include                 "John4.ff"
+include			"Nup155_intra.ff"
+include                 "Nup93_intra.ff"
+include                 "Nup205_intra.ff"
+include			"InnerRing_inter.ff"
+include			"Nup54_intra.ff"
+include                 "Nup58_intra.ff"
+include                 "Nup62_intra.ff"
+include                 "FGNup_inter.ff"
+include                 "Ycomplex_intra.ff"
+include                 "Ycomplex_inter.ff"
+include			"Nup188_intra.ff"
+include			"Nup35_intra.ff"
+include                 "Nup188_inter.ff"
+include                 "Nup35_inter.ff"
+include			"Nup98_intra.ff"
+include                 "Capsid_intra.ff"
+
+include                 "Nup205-scaffold_inter.ff"
+include                 "Nup188-scaffold_inter.ff"
+include                 "Nup35-scaffold_inter.ff"
+include                 "FGNup-scaffold_inter.ff"
+include			"Nup155-Nup160_inter.ff"
+include			"Ycomplex_ring.ff"
+include			"Nup98_inter.ff"
+include                 "lipid.ff"
+include                 "Capsid_assembly.ff"
+include			"FG-Capsid.ff"
+include			"Nup98FG-Capsid.ff"
+
+group			Nup155 type <> 1 279
+group			Nup93 type <> 280 443
+group			Nup205 type <> 444 847
+group			Nup188-ntd type <> 2468 2723 
+group                   Nup188-ctd type <> 2724 2818
+group                   Nup35 type <> 2819 2866
+group			Nup98 type <> 2867 2990
+
+group                   Nup133-NTD type <> 848 948
+group                   Nup133-CTD type <> 949 1079
+group                   Nup107-NTD type <> 1080 1199
+group                   Nup107-CTD type <> 1200 1264
+group                   Nup96 type <> 1265 1452
+group                   Sec13 type <> 1453 1517
+group                   Seh1 type <> 1518 1589
+group                   Nup85 type <> 1590 1723
+group                   Nup43 type <> 1724 1799
+group                   Nup160-NTD type <> 1800 1854
+group                   Nup160-CTD type <> 1855 2071
+group                   Nup37 type <> 2072 2152
+
+group			Nup54 type <> 2153 2254
+group			Nup58 type <> 2255 2374
+group			Nup62 type <> 2375 2467 
+
+group                   Mem type <> 2991 2993
+group                   Capsid type <> 2994 3039
+
+neigh_modify            exclude molecule/intra Nup155
+neigh_modify            exclude molecule/intra Nup93
+neigh_modify            exclude molecule/intra Nup205
+neigh_modify            exclude molecule/intra Nup188-ntd
+neigh_modify            exclude molecule/intra Nup188-ctd
+neigh_modify            exclude molecule/intra Nup35
+
+neigh_modify            exclude molecule/intra Nup133-NTD
+neigh_modify            exclude molecule/intra Nup133-CTD
+neigh_modify            exclude molecule/intra Nup107-NTD
+neigh_modify            exclude molecule/intra Nup107-CTD
+neigh_modify            exclude molecule/intra Nup96
+neigh_modify            exclude molecule/intra Sec13
+neigh_modify            exclude molecule/intra Seh1
+neigh_modify            exclude molecule/intra Nup85
+neigh_modify            exclude molecule/intra Nup43
+neigh_modify            exclude molecule/intra Nup160-NTD
+neigh_modify            exclude molecule/intra Nup160-CTD
+neigh_modify            exclude molecule/intra Nup37
+
+neigh_modify		exclude molecule/intra Nup54
+neigh_modify            exclude molecule/intra Nup58
+neigh_modify            exclude molecule/intra Nup62
+
+neigh_modify            exclude molecule/intra Capsid
+
+group                   Stemtip union Nup133-NTD Nup133-CTD Nup107-CTD
+group                   Stembase union Nup107-NTD Nup96 Sec13
+group                   Shortarm union Seh1 Nup85 Nup43
+group                   Longarm union Nup160-CTD Nup160-NTD Nup37
+group			Nup188 union Nup188-ntd Nup188-ctd
+
+group                   Ycomplex union Stemtip Stembase Shortarm Longarm 
+group			FGNup union Nup54 Nup58 Nup62
+	
+timestep  		50.0 			#timestep of 50 fs
+
+comm_style              tiled
+comm_modify             mode single cutoff 70.00
+
+compute                 1 Capsid pair gauss/wall
+
+thermo       		1000
+thermo_style            custom step spcpu temp ke pe etotal epair enthalpy pxx pyy pzz lx ly lz c_1  
+thermo_modify           flush yes
+
+fix                    	wallEdge all wall/reflect zlo EDGE zhi EDGE units box
+fix                     m1 Capsid momentum 100000 linear 1 1 1 angular
+fix                     b1 all balance 100000 1.05 rcb
+
+compute                 CapsidCOM Capsid com
+variable                zCapsid equal c_CapsidCOM[3]
+compute                 ChannelCOM Ycomplex com
+variable                zChannel equal c_ChannelCOM[3]
+variable                distz equal "c_CapsidCOM[3]-c_ChannelCOM[3]"
+
+velocity                all create ${TEMP} ${SEED} mom yes rot yes dist gaussian
+
+reset_timestep          0
+
+fix                     3 all nph x ${PRESS} ${PRESS} 200000.0 y ${PRESS} ${PRESS} 200000.0 couple xy dilate Mem
+fix                     4 all langevin ${TEMP} ${TEMP} 100000.0 ${SEED4} zero yes
+
+dump            	1 all custom ${dumptrj} Nup1.lammpstrj id mol type xs ys zs 
+dump_modify 		1 sort id
+
+fix                     scales all print 1000 "${vstep} ${zCapsid} ${zChannel} ${distz}" file Docking.txt screen no
+
+restart                 ${RESTART} config
+run 			${RUNTIME}
+
+write_data 		eq0.data nocoeff
+

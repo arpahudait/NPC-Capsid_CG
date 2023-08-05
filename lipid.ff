@@ -1,0 +1,25 @@
+##### MEMBRANE (Grime 4-site model) #####################
+##### 2991 is the head group of the membrane #############
+
+pair_coeff   2991  2991  john4 	${A_HH}    ${R_HH}   0.0   ${R_HH}
+pair_coeff   2991  2992  john4 	${A}    ${R}   0.0   ${R}
+pair_coeff   2991  2993  john4 	${A}    ${R}   0.0   ${R}
+
+pair_coeff   2992  2992  john4  ${A}    ${R}   ${B}   ${RC}
+pair_coeff   2992  2993  john4  ${A}    ${R}   0.0   ${R}
+
+pair_coeff   2993  2993  john4  ${A}    ${R}   ${B}   ${RC}
+
+bond_coeff   62660        ${BOND_K}  ${BOND_R}
+bond_coeff   62661        ${BOND_K}  ${BOND_R}
+
+angle_coeff   1        ${BEND_K}  180.0
+angle_coeff   2        ${BEND_K}  180.0
+
+##### Nup155-ntd-Membrane interaction 
+pair_coeff       1*96  2991    lj/cut/soft    1.2   12.5    0.6
+##### Nup133-ntd-Membrane interaction 
+pair_coeff    848*948  2991    lj/cut/soft    1.2   12.5    0.6
+##### Nup160-ntd-Membrane interaction 
+pair_coeff   1800*1854 2991    lj/cut/soft    1.2   12.5    0.6
+

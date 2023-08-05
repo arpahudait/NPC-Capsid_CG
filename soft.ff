@@ -1,0 +1,19 @@
+### NPC-NPC volume exclusion
+pair_coeff      1*2990     1*2990  soft   15.000  10.000
+pair_coeff       1*847      1*847  soft   15.000  10.000
+pair_coeff    848*2152   848*2152  soft   15.000  10.000
+pair_coeff   2153*2467  2153*2467  soft   15.000  10.000
+pair_coeff   2468*2818  2468*2818  soft   15.000  10.000
+pair_coeff   2819*2866  2819*2866  soft   15.000  10.000
+pair_coeff   2867*2990  2867*2990  soft   15.000  10.000
+
+### NPC-Membrane volume exclusion
+pair_coeff    1*2990     2991  soft  15.000  10.000
+pair_coeff    1*2990     2992  soft  15.000  10.000
+pair_coeff    1*2990     2993  soft  15.000  10.000
+
+### Capsid volume exclusion
+pair_coeff      1*2993  2994*3039  soft   15.000  10.000
+
+pair_coeff   2994*3039  2994*3039  soft   15.000  10.000
+
